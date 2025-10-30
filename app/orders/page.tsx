@@ -54,10 +54,10 @@ export default function OrdersPage() {
           ) : (
             <div className="space-y-4">
               {orders.map((order) => (
-                <Card key={order.id} className="p-6">
+                <Card key={order._id || order.id} className="p-6">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
-                      <h3 className="font-semibold text-lg">{order.id}</h3>
+                      <h3 className="font-semibold text-lg">{order._id || order.id}</h3>
                       <p className="text-sm text-muted-foreground">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -69,7 +69,7 @@ export default function OrdersPage() {
                         <p className="text-sm text-muted-foreground">Status</p>
                         <p className="font-semibold capitalize text-primary">{order.status}</p>
                       </div>
-                      <Link href={`/order-confirmation/${order.id}`}>
+                      <Link href={`/order-confirmation/${order._id || order.id}`}>
                         <Button variant="outline" size="sm">
                           View Details
                         </Button>

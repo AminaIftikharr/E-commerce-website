@@ -86,12 +86,12 @@ export default function AdminPage() {
                 .reverse()
                 .map((order) => (
                   <div
-                    key={order.id}
+                    key={order._id || order.id}
                     className="flex justify-between items-center pb-3 border-b border-border last:border-0"
                   >
                     <div>
                       <p className="font-medium">{order.customerName}</p>
-                      <p className="text-sm text-muted-foreground">{order.id}</p>
+                      <p className="text-sm text-muted-foreground">{order._id || order.id}</p>
                     </div>
                     <p className="font-bold text-primary">Rs {order.total.toLocaleString()}</p>
                   </div>
@@ -105,7 +105,7 @@ export default function AdminPage() {
             <div className="space-y-3">
               {lowStockItems.slice(0, 5).map((product) => (
                 <div
-                  key={product.id}
+                  key={product._id || product.id}
                   className="flex justify-between items-center pb-3 border-b border-border last:border-0"
                 >
                   <div>
