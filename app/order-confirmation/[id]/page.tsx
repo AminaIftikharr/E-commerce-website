@@ -1,5 +1,6 @@
 "use client"
 
+import { use } from "react"
 import Link from "next/link"
 import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
@@ -10,10 +11,11 @@ import { CheckCircle, Package } from "lucide-react"
 export default function OrderConfirmationPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
   const { orders } = useStore()
-  const order = orders.find((o) => o.id === params.id)
+  const { id } = use(params)
+  const order = orders.find((o) => (o._id || o.id) === id)
 
   if (!order) {
     return (

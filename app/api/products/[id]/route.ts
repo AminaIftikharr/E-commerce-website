@@ -3,11 +3,12 @@ import connectDB from "@/lib/mongodb"
 import Product from "@/lib/models/Product"
 
 // GET single product by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const product = await Product.findById(params.id)
+    const { id } = await params
+    const product = await Product.findById(id)
 
     if (!product) {
       return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 })
@@ -21,12 +22,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT update product
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
+    const { id } = await params
     const body = await request.json()
-    const product = await Product.findByIdAndUpdate(params.id, body, {
+    const product = await Product.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     })
@@ -43,11 +45,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE product
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const product = await Product.findByIdAndDelete(params.id)
+    const { id } = await params
+    const product = await Product.findByIdAndDelete(id)
 
     if (!product) {
       return NextResponse.json({ success: false, error: "Product not found" }, { status: 404 })

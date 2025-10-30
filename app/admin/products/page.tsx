@@ -95,7 +95,7 @@ export default function ProductsPage() {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
               <ProductForm
-                product={products.find((p) => p.id === editingProduct)}
+                product={products.find((p) => (p._id || p.id) === editingProduct)}
                 onSubmit={(data) => handleUpdateProduct(editingProduct, data)}
                 onCancel={() => setEditingProduct(null)}
               />
@@ -106,7 +106,7 @@ export default function ProductsPage() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="p-6 hover:shadow-lg transition-shadow">
+            <Card key={product._id || product.id} className="p-6 hover:shadow-lg transition-shadow">
               <div className="mb-4">
                 <h3 className="text-lg font-bold mb-1">{product.name}</h3>
                 <p className="text-sm text-muted-foreground capitalize">{product.category}</p>
@@ -131,14 +131,14 @@ export default function ProductsPage() {
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => setEditingProduct(product.id)}
+                  onClick={() => setEditingProduct(product._id || product.id)}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteProduct(product.id)}
+                  onClick={() => handleDeleteProduct(product._id || product.id)}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />

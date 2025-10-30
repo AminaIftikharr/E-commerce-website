@@ -3,11 +3,12 @@ import connectDB from "@/lib/mongodb"
 import Order from "@/lib/models/Order"
 
 // GET single order by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const order = await Order.findById(params.id).populate("items.productId")
+    const { id } = await params
+    const order = await Order.findById(id).populate("items.productId")
 
     if (!order) {
       return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 })
@@ -21,12 +22,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PUT update order
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
+    const { id } = await params
     const body = await request.json()
-    const order = await Order.findByIdAndUpdate(params.id, body, {
+    const order = await Order.findByIdAndUpdate(id, body, {
       new: true,
       runValidators: true,
     }).populate("items.productId")
@@ -43,11 +45,12 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 // DELETE order
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB()
 
-    const order = await Order.findByIdAndDelete(params.id)
+    const { id } = await params
+    const order = await Order.findByIdAndDelete(id)
 
     if (!order) {
       return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 })

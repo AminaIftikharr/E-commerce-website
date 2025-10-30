@@ -1,16 +1,17 @@
 "use client"
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useStore } from "@/lib/store-context"
 import { ArrowLeft, ShoppingCart, Heart } from "lucide-react"
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { products, addToCart } = useStore()
-  const product = products.find((p) => p.id === params.id)
+  const { id } = use(params)
+  const product = products.find((p) => (p._id || p.id) === id)
   const [quantity, setQuantity] = useState(1)
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0])
   const [selectedDesign, setSelectedDesign] = useState(product?.designs?.[0])
@@ -30,7 +31,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
   const handleAddToCart = () => {
     addToCart({
-      productId: product.id,
+      productId: product._id || product.id,
       quantity,
       customization: product.customizable
         ? {
