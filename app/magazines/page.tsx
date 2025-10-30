@@ -21,7 +21,7 @@ export default function MagazinesPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {magazines.map((product) => (
-            <Link key={product.id} href={`/product/${product.id}`}>
+            <Link key={product._id || product.id} href={`/product/${product._id || product.id}`}>
               <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden group">
                 <div className="aspect-square bg-muted overflow-hidden">
                   <img
