@@ -1,27 +1,15 @@
-import type { Metadata } from "next"
+"use client"
+
 import { useStore } from "@/lib/store-context"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Custom Journals | Craft & Memories",
-  description:
-    "Shop personalized journals including daily journals, reading journals, gratitude journals, and travel journals. Create your perfect journal with customizable designs and premium quality.",
-  keywords:
-    "custom journals, personalized journals, daily journal, reading journal, gratitude journal, travel journal, custom diary, journal with customization",
-  openGraph: {
-    title: "Custom Journals | Craft & Memories",
-    description: "Create beautiful personalized journals for daily reflection and memories.",
-    type: "website",
-  },
-}
 
 export default function JournalsPage() {
   const { products } = useStore()
   const journals = products.filter((p) => p.category === "journals")
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Custom Journals</h1>

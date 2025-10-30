@@ -1,27 +1,15 @@
-import type { Metadata } from "next"
+"use client"
+
 import { useStore } from "@/lib/store-context"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Custom Scrapbooks | Craft & Memories",
-  description:
-    "Shop personalized scrapbooks for babies, couples, friends, and families. Create beautiful memory books with customizable designs, premium quality pages, and endless personalization options.",
-  keywords:
-    "custom scrapbooks, personalized scrapbooks, baby scrapbook, couple scrapbook, friendship scrapbook, family scrapbook, memory book, DIY scrapbook",
-  openGraph: {
-    title: "Custom Scrapbooks | Craft & Memories",
-    description: "Create beautiful personalized scrapbooks to preserve your precious memories.",
-    type: "website",
-  },
-}
 
 export default function ScrapbooksPage() {
   const { products } = useStore()
   const scrapbooks = products.filter((p) => p.category === "scrapbooks")
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Custom Scrapbooks</h1>

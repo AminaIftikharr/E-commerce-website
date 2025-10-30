@@ -1,5 +1,6 @@
 export interface Product {
-  id: string
+  _id?: string // MongoDB ID
+  id?: string // Legacy ID
   name: string
   description: string
   price: number
@@ -12,6 +13,8 @@ export interface Product {
   keywords?: string[]
   seoTitle?: string
   seoDescription?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface CartItem {
@@ -25,11 +28,12 @@ export interface CartItem {
 }
 
 export interface Order {
-  id: string
+  _id?: string // MongoDB ID
+  id?: string // Legacy ID
   items: CartItem[]
   total: number
   status: "pending" | "processing" | "shipped" | "delivered" | "cancelled"
-  createdAt: string
+  createdAt?: string
   customerName: string
   customerEmail: string
   customerPhone: string
@@ -38,6 +42,7 @@ export interface Order {
   customerZipCode: string
   paymentMethod: "credit-card" | "debit-card" | "paypal" | "bank-transfer"
   date?: string
+  updatedAt?: string
 }
 
 export interface User {

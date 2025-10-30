@@ -19,26 +19,32 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
     setIsLoading(true)
 
-    setTimeout(() => {
-      if (email && password) {
-        const isAdmin = email === "admin@craftmemories.com"
-        setCurrentUser({
-          id: `user-${Date.now()}`,
-          email,
-          name: email.split("@")[0],
-          role: isAdmin ? "admin" : "customer",
-        })
-        router.push(isAdmin ? "/admin" : "/")
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setCurrentUser(data.data)
+        router.push(data.data.role === "admin" ? "/admin" : "/")
       } else {
-        setError("Please fill in all fields")
+        setError(data.error || "Login failed")
       }
+    } catch (error) {
+      setError("An error occurred. Please try again.")
+      console.error("Login error:", error)
+    } finally {
       setIsLoading(false)
-    }, 800)
+    }
   }
 
   return (

@@ -19,7 +19,10 @@ export default function OrdersPage() {
     }
     const initialStatus: Record<string, string> = {}
     orders.forEach((order) => {
-      initialStatus[order.id] = order.status
+      const orderId = order._id?.toString() || order.id || ""
+      if (orderId) {
+        initialStatus[orderId] = order.status
+      }
     })
     setSelectedStatus(initialStatus)
   }, [currentUser, isAdmin, router, orders])
@@ -57,16 +60,18 @@ export default function OrdersPage() {
         {/* Orders List */}
         <div className="space-y-4">
           {orders.length > 0 ? (
-            orders.map((order) => (
-              <Card key={order.id} className="overflow-hidden">
+            orders.map((order) => {
+              const orderId = order._id?.toString() || order.id || ""
+              return (
+              <Card key={orderId} className="overflow-hidden">
                 <div
                   className="p-6 cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => setExpandedOrder(expandedOrder === order.id ? null : order.id)}
+                  onClick={() => setExpandedOrder(expandedOrder === orderId ? null : orderId)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-2">
-                        <h3 className="font-mono text-sm font-bold">{order.id}</h3>
+                        <h3 className="font-mono text-sm font-bold">{orderId}</h3>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[order.status]}`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
@@ -82,7 +87,7 @@ export default function OrdersPage() {
                           <strong>Total:</strong> ${order.total.toFixed(2)}
                         </span>
                         <span>
-                          <strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
+                          <strong>Date:</strong> {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
                         </span>
                       </div>
                     </div>
@@ -90,7 +95,7 @@ export default function OrdersPage() {
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
-                          setDeleteConfirm(order.id)
+                          setDeleteConfirm(orderId)
                         }}
                         className="p-2 hover:bg-red-100 rounded-lg transition-colors text-red-600"
                         title="Delete order"
@@ -98,20 +103,20 @@ export default function OrdersPage() {
                         <Trash2 className="w-5 h-5" />
                       </button>
                       <ChevronDown
-                        className={`w-5 h-5 transition-transform ${expandedOrder === order.id ? "rotate-180" : ""}`}
+                        className={`w-5 h-5 transition-transform ${expandedOrder === orderId ? "rotate-180" : ""}`}
                       />
                     </div>
                   </div>
                 </div>
 
-                {deleteConfirm === order.id && (
+                {deleteConfirm === orderId && (
                   <div className="border-t border-red-200 bg-red-50 p-4">
                     <p className="text-sm mb-3">
                       Are you sure you want to delete this order? This action cannot be undone.
                     </p>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleDeleteOrder(order.id)}
+                        onClick={() => handleDeleteOrder(orderId)}
                         className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
                       >
                         Delete Order
@@ -126,7 +131,7 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                {expandedOrder === order.id && (
+                {expandedOrder === orderId && (
                   <div className="border-t border-border p-6 bg-muted/30 space-y-6">
                     {/* Customer Information */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -166,8 +171,8 @@ export default function OrdersPage() {
                       <div>
                         <h4 className="font-semibold mb-3">Order Status</h4>
                         <select
-                          value={selectedStatus[order.id] || order.status}
-                          onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                          value={selectedStatus[orderId] || order.status}
+                          onChange={(e) => handleStatusUpdate(orderId, e.target.value)}
                           className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                         >
                           <option value="pending">Pending</option>
@@ -203,7 +208,7 @@ export default function OrdersPage() {
                   </div>
                 )}
               </Card>
-            ))
+            )})
           ) : (
             <Card className="p-12 text-center">
               <p className="text-muted-foreground">No orders yet</p>

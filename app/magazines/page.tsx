@@ -1,27 +1,15 @@
-import type { Metadata } from "next"
+"use client"
+
 import { useStore } from "@/lib/store-context"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Custom Magazines | Craft & Memories",
-  description:
-    "Shop personalized magazines including wedding magazines, birthday magazines, couple magazines, friendship magazines, and travel magazines. Create custom memories with our premium magazine collection.",
-  keywords:
-    "custom magazines, personalized magazines, wedding magazine, birthday magazine, couple magazine, friendship magazine, travel magazine, custom photo magazine",
-  openGraph: {
-    title: "Custom Magazines | Craft & Memories",
-    description: "Create beautiful personalized magazines for every occasion.",
-    type: "website",
-  },
-}
 
 export default function MagazinesPage() {
   const { products } = useStore()
   const magazines = products.filter((p) => p.category === "magazines")
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Custom Magazines</h1>

@@ -1,27 +1,15 @@
-import type { Metadata } from "next"
+"use client"
+
 import { useStore } from "@/lib/store-context"
 import Link from "next/link"
 import { Card } from "@/components/ui/card"
-
-export const metadata: Metadata = {
-  title: "Craft Supplies & Tools | Craft & Memories",
-  description:
-    "Shop premium craft supplies and tools including decorative tape, highlighters, sticky notes, stamps, stickers, and pens. Perfect for scrapbooking, journaling, and DIY projects.",
-  keywords:
-    "craft supplies, craft tools, decorative tape, highlighters, sticky notes, stamps, stickers, pens, scrapbooking supplies, DIY craft tools",
-  openGraph: {
-    title: "Craft Supplies & Tools | Craft & Memories",
-    description: "Premium craft supplies and tools for all your creative projects.",
-    type: "website",
-  },
-}
 
 export default function ToolsPage() {
   const { products } = useStore()
   const tools = products.filter((p) => p.category === "tools")
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-b from-background to-muted/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Craft Supplies & Tools</h1>
