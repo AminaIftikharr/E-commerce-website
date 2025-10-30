@@ -98,8 +98,8 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Button variant="outline" className="w-full bg-transparent">
-            Sign up as Customer
+          <Button variant="outline" className="w-full bg-transparent" asChild>
+            <Link href="/signup">Sign up as Customer</Link>
           </Button>
 
           <p className="text-center text-sm text-muted-foreground">
