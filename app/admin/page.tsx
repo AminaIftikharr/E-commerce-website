@@ -62,7 +62,7 @@ export default function AdminPage() {
               <p className="text-sm text-muted-foreground">Total Revenue</p>
               <TrendingUp className="w-5 h-5 text-green-500" />
             </div>
-            <p className="text-3xl font-bold">${stats.totalRevenue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">Rs {stats.totalRevenue.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">From orders</p>
           </Card>
 
@@ -71,7 +71,7 @@ export default function AdminPage() {
               <p className="text-sm text-muted-foreground">Inventory Value</p>
               <BarChart3 className="w-5 h-5 text-secondary" />
             </div>
-            <p className="text-3xl font-bold">${stats.totalInventoryValue.toFixed(2)}</p>
+            <p className="text-3xl font-bold">Rs {stats.totalInventoryValue.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground">Current stock</p>
           </Card>
         </div>
@@ -93,7 +93,7 @@ export default function AdminPage() {
                       <p className="font-medium">{order.customerName}</p>
                       <p className="text-sm text-muted-foreground">{order.id}</p>
                     </div>
-                    <p className="font-bold text-primary">${order.total.toFixed(2)}</p>
+                    <p className="font-bold text-primary">Rs {order.total.toLocaleString()}</p>
                   </div>
                 ))}
               {orders.length === 0 && <p className="text-muted-foreground text-center py-4">No orders yet</p>}

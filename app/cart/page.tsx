@@ -7,19 +7,18 @@ import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useStore } from "@/lib/store-context"
-import { mockProducts } from "@/lib/mock-data"
 import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react"
 import { CheckoutForm, type CheckoutData } from "@/components/checkout-form"
 
 export default function CartPage() {
   const router = useRouter()
-  const { cart, removeFromCart, updateCart, clearCart, addOrder } = useStore()
+  const { cart, removeFromCart, updateCart, clearCart, addOrder, products } = useStore()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [showCheckoutForm, setShowCheckoutForm] = useState(false)
 
   const cartItems = cart.map((item) => ({
     ...item,
-    product: mockProducts.find((p) => p.id === item.productId),
+    product: products.find((p) => (p._id || p.id) === item.productId),
   }))
 
   const total = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
@@ -161,7 +160,7 @@ export default function CartPage() {
                               />
                             </div>
                             <span className="font-semibold">
-                              ${((item.product?.price || 0) * item.quantity).toFixed(2)}
+                              Rs {((item.product?.price || 0) * item.quantity).toLocaleString()}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.productId)}
@@ -184,7 +183,7 @@ export default function CartPage() {
                     <div className="space-y-2 border-t border-border pt-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal:</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>Rs {total.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Shipping:</span>
@@ -192,13 +191,13 @@ export default function CartPage() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Tax:</span>
-                        <span>${(total * 0.1).toFixed(2)}</span>
+                        <span>Rs {(total * 0.1).toLocaleString()}</span>
                       </div>
                     </div>
 
                     <div className="border-t border-border pt-4 flex justify-between font-bold text-lg">
                       <span>Total:</span>
-                      <span className="text-primary">${(total * 1.1).toFixed(2)}</span>
+                      <span className="text-primary">Rs {(total * 1.1).toLocaleString()}</span>
                     </div>
 
                     <Button

@@ -58,12 +58,12 @@ export default function OrdersPage() {
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <h3 className="font-semibold text-lg">{order.id}</h3>
-                      <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleDateString()}</p>
+                      <p className="text-sm text-muted-foreground">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</p>
                     </div>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Total</p>
-                        <p className="text-lg font-bold text-primary">${order.total.toFixed(2)}</p>
+                        <p className="text-lg font-bold text-primary">Rs {order.total.toLocaleString()}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">Status</p>

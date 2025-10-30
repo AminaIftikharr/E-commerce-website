@@ -36,7 +36,7 @@ export default function ScrapbooksPage() {
                     <p className="text-sm text-muted-foreground line-clamp-2">{product.description}</p>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-primary">${product.price}</span>
+                    <span className="text-2xl font-bold text-primary">Rs {product.price.toLocaleString()}</span>
                     {product.customizable && (
                       <span className="text-xs bg-secondary text-secondary-foreground px-2 py-1 rounded-full">
                         Customizable

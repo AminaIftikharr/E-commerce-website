@@ -69,6 +69,11 @@ const OrderSchema = new Schema(
   }
 )
 
-const Order = models.Order || mongoose.model("Order", OrderSchema)
+// Delete the cached model to force recreation
+if (models.Order) {
+  delete models.Order
+}
+
+const Order = mongoose.model("Order", OrderSchema)
 
 export default Order

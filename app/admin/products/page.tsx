@@ -116,7 +116,7 @@ export default function ProductsPage() {
 
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <p className="text-2xl font-bold text-primary">${product.price}</p>
+                  <p className="text-2xl font-bold text-primary">Rs {product.price.toLocaleString()}</p>
                   <p className="text-sm text-muted-foreground">
                     Stock:{" "}
                     <span className={product.stock < 20 ? "text-destructive font-bold" : ""}>{product.stock}</span>

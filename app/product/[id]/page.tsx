@@ -89,7 +89,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             </div>
 
             <div className="space-y-2">
-              <span className="text-4xl font-bold text-primary">${product.price}</span>
+              <span className="text-4xl font-bold text-primary">Rs {product.price.toLocaleString()}</span>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-green-600 font-medium">✓ In Stock ({product.stock} available)</span>
               </div>
