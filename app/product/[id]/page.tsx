@@ -31,7 +31,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
   const handleAddToCart = () => {
     addToCart({
-      productId: product._id || product.id,
+      productId: (product._id || product.id) as string,
       quantity,
       customization: product.customizable
         ? {

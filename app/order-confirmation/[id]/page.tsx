@@ -60,7 +60,7 @@ export default function OrderConfirmationPage({
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Order Date</p>
-                <p className="font-semibold">{new Date(order.createdAt).toLocaleDateString()}</p>
+                <p className="font-semibold">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : 'N/A'}</p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Total</p>

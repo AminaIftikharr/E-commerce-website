@@ -19,7 +19,7 @@ export interface CheckoutData {
   customerAddress: string
   customerCity: string
   customerZipCode: string
-  paymentMethod: "credit-card" | "debit-card" | "paypal" | "bank-transfer"
+  paymentMethod: "cash-on-delivery"
 }
 
 export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps) {
@@ -30,7 +30,7 @@ export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps)
     customerAddress: "",
     customerCity: "",
     customerZipCode: "",
-    paymentMethod: "credit-card",
+    paymentMethod: "cash-on-delivery",
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -168,45 +168,28 @@ export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps)
           <h3 className="font-semibold text-lg">Payment Method</h3>
 
           <div className="space-y-3">
-            {[
-              { value: "credit-card", label: "Credit Card" },
-              { value: "debit-card", label: "Debit Card" },
-              { value: "paypal", label: "PayPal" },
-              { value: "bank-transfer", label: "Bank Transfer" },
-            ].map((method) => (
-              <label
-                key={method.value}
-                className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value={method.value}
-                  checked={formData.paymentMethod === method.value}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      paymentMethod: e.target.value as CheckoutData["paymentMethod"],
-                    })
-                  }
-                  className="w-4 h-4"
-                />
-                <span className="font-medium">{method.label}</span>
-              </label>
-            ))}
+            <div className="flex items-center gap-3 p-4 border-2 border-primary rounded-lg bg-primary/5">
+              <div className="w-5 h-5 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
+                <div className="w-2 h-2 rounded-full bg-white"></div>
+              </div>
+              <div>
+                <span className="font-semibold block">Cash on Delivery</span>
+                <span className="text-sm text-muted-foreground">Pay when you receive your order</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Info Alert */}
         <div className="flex gap-3 p-4 bg-primary/10 border border-primary/20 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
           <p className="text-sm text-primary">
             All fields are mandatory. Please fill in all information before proceeding.
           </p>
         </div>
 
         <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-          {isLoading ? "Processing..." : "Continue to Payment"}
+          {isLoading ? "Processing..." : "Place Order"}
         </Button>
       </form>
     </Card>

@@ -131,14 +131,14 @@ export default function ProductsPage() {
 
               <div className="flex gap-2">
                 <button
-                  onClick={() => setEditingProduct(product._id || product.id)}
+                  onClick={() => setEditingProduct((product._id || product.id) as string)}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
                 </button>
                 <button
-                  onClick={() => handleDeleteProduct(product._id || product.id)}
+                  onClick={() => handleDeleteProduct((product._id || product.id) as string)}
                   className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />

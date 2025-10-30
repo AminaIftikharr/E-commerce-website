@@ -55,7 +55,8 @@ const OrderSchema = new Schema(
     },
     paymentMethod: {
       type: String,
-      enum: ["credit-card", "debit-card", "paypal", "bank-transfer"],
+      enum: ["cash-on-delivery", "credit-card", "debit-card", "paypal", "bank-transfer"],
+      default: "cash-on-delivery",
       required: true,
     },
     userId: {

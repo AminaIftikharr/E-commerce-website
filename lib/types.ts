@@ -40,7 +40,7 @@ export interface Order {
   customerAddress: string
   customerCity: string
   customerZipCode: string
-  paymentMethod: "credit-card" | "debit-card" | "paypal" | "bank-transfer"
+  paymentMethod: "cash-on-delivery" | "credit-card" | "debit-card" | "paypal" | "bank-transfer"
   date?: string
   updatedAt?: string
 }

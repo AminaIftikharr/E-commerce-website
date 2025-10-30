@@ -24,28 +24,46 @@ export default function CartPage() {
 
   const total = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
 
-  const handleCheckout = (checkoutData: CheckoutData) => {
+  const handleCheckout = async (checkoutData: CheckoutData) => {
     setIsCheckingOut(true)
-    setTimeout(() => {
-      const order = {
-        id: `ORD-${Date.now()}`,
-        items: cart,
-        total: total * 1.1,
-        status: "pending" as const,
-        createdAt: new Date().toISOString(),
-        date: new Date().toISOString(),
-        customerName: checkoutData.customerName,
-        customerEmail: checkoutData.customerEmail,
-        customerPhone: checkoutData.customerPhone,
-        customerAddress: checkoutData.customerAddress,
-        customerCity: checkoutData.customerCity,
-        customerZipCode: checkoutData.customerZipCode,
-        paymentMethod: checkoutData.paymentMethod,
+    
+    const order = {
+      items: cart,
+      total: total * 1.1,
+      status: "pending" as const,
+      createdAt: new Date().toISOString(),
+      date: new Date().toISOString(),
+      customerName: checkoutData.customerName,
+      customerEmail: checkoutData.customerEmail,
+      customerPhone: checkoutData.customerPhone,
+      customerAddress: checkoutData.customerAddress,
+      customerCity: checkoutData.customerCity,
+      customerZipCode: checkoutData.customerZipCode,
+      paymentMethod: checkoutData.paymentMethod,
+    }
+    
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      })
+      
+      const data = await response.json()
+      
+      if (data.success && data.data) {
+        clearCart()
+        // Use the MongoDB _id from the created order
+        router.push(`/order-confirmation/${data.data._id}`)
+      } else {
+        alert("Failed to create order. Please try again.")
+        setIsCheckingOut(false)
       }
-      addOrder(order)
-      clearCart()
-      router.push(`/order-confirmation/${order.id}`)
-    }, 1500)
+    } catch (error) {
+      console.error("Error creating order:", error)
+      alert("An error occurred. Please try again.")
+      setIsCheckingOut(false)
+    }
   }
 
   if (cart.length === 0 && !showCheckoutForm) {
@@ -105,7 +123,7 @@ export default function CartPage() {
                   {cartItems.map((item) => (
                     <Card key={item.productId} className="p-4">
                       <div className="flex gap-4">
-                        <div className="w-24 h-24 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-24 h-24 bg-muted rounded-lg overflow-hidden shrink-0">
                           <img
                             src={item.product?.image || "/placeholder.svg"}
                             alt={item.product?.name}
