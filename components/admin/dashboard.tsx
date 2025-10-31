@@ -6,9 +6,10 @@ import { Card } from "@/components/ui/card"
 import { mockProducts } from "@/lib/mock-data"
 import { Plus, Edit2, Trash2, BarChart3 } from "lucide-react"
 import { ProductForm } from "./product-form"
+import { Product, ProductFormData } from "@/lib/types"
 
 export function AdminDashboard() {
-  const [products, setProducts] = useState(mockProducts)
+  const [products, setProducts] = useState<Product[]>(mockProducts)
   const [showForm, setShowForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"products" | "analytics">("products")
@@ -24,15 +25,15 @@ export function AdminDashboard() {
     setShowForm(false)
   }
 
-  const handleUpdateProduct = (id: string, formData: any) => {
+  const handleUpdateProduct = (id: string, formData: Partial<Product>) => {
     setProducts(
       products.map((p) =>
-        p.id === id
+        p._id === id
           ? {
               ...p,
               ...formData,
-              stock: Number.parseInt(formData.stock),
-              price: Number.parseFloat(formData.price),
+              stock: Number(formData.stock),
+              price: Number(formData.price),
             }
           : p,
       ),
@@ -41,7 +42,7 @@ export function AdminDashboard() {
   }
 
   const handleDeleteProduct = (id: string) => {
-    setProducts(products.filter((p) => p.id !== id))
+    setProducts(products.filter((p) => p._id !== id))
   }
 
   const stats = {
@@ -158,13 +159,13 @@ export function AdminDashboard() {
                       <td className="py-3 px-4">
                         <div className="flex gap-2">
                           <button
-                            onClick={() => setEditingProduct(product.id)}
+                             onClick={() => product._id && setEditingProduct(product._id)}
                             className="p-2 hover:bg-muted rounded text-primary"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
-                            onClick={() => handleDeleteProduct(product.id)}
+                            onClick={() => product._id && handleDeleteProduct(product._id)}
                             className="p-2 hover:bg-muted rounded text-destructive"
                           >
                             <Trash2 className="w-4 h-4" />
