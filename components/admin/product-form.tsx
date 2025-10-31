@@ -4,6 +4,7 @@ import type React from "react"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import type { Product } from "@/lib/types"
+import { mockProducts } from "@/lib/mock-data"
 import { X, Upload } from "lucide-react"
 
 interface ProductFormProps {
@@ -45,8 +46,29 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    // create a slug from name for SEO-friendly URLs and ensure it's unique
+    const makeSlug = (s: string) =>
+      s
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+
+    const makeUniqueSlug = (base: string) => {
+      let slug = makeSlug(base)
+      // exclude current product when editing
+      const existing = mockProducts.filter((p) => (product ? p.id !== product.id && p._id !== product._id : true))
+      if (!existing.find((p) => p.slug === slug)) return slug
+      let i = 1
+      while (existing.find((p) => p.slug === `${slug}-${i}`)) {
+        i++
+      }
+      return `${slug}-${i}`
+    }
+
     onSubmit({
       ...formData,
+      slug: makeUniqueSlug(formData.name),
       colors: formData.colors
         .split(",")
         .map((c) => c.trim())

@@ -5,6 +5,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-1",
     name: "Wedding Magazine",
+    slug: "wedding-magazine",
     description:
       "Personalized wedding planning magazine with custom layouts, designs, and colors. Perfect for documenting your special day.",
     price: 24.99,
@@ -22,6 +23,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-2",
     name: "Birthday Magazine",
+    slug: "birthday-magazine",
     description:
       "Celebrate special birthdays with custom photo layouts and memory pages. Create lasting memories of milestone moments.",
     price: 19.99,
@@ -39,6 +41,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-3",
     name: "Couple Magazine",
+    slug: "couple-magazine",
     description:
       "Celebrate your relationship with a custom couple magazine. Perfect for anniversaries, engagements, or just documenting your love story.",
     price: 22.99,
@@ -56,6 +59,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-4",
     name: "Friendship Magazine",
+    slug: "friendship-magazine",
     description:
       "Celebrate friendships with custom photo layouts and memories. Perfect for best friends and group celebrations.",
     price: 19.99,
@@ -72,6 +76,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-5",
     name: "Travel Magazine",
+    slug: "travel-magazine",
     description:
       "Document your adventures with custom travel magazine. Perfect for vacation memories and travel stories.",
     price: 22.99,
@@ -88,6 +93,7 @@ export const mockProducts: Product[] = [
   {
     id: "mag-6",
     name: "Anniversary Magazine",
+    slug: "anniversary-magazine",
     description: "Celebrate years of love and memories with a custom anniversary magazine. Perfect for any milestone.",
     price: 24.99,
     category: "magazines",
@@ -105,6 +111,7 @@ export const mockProducts: Product[] = [
   {
     id: "journal-1",
     name: "Daily Journal",
+    slug: "daily-journal",
     description: "Guided daily journal for reflection and mindfulness. Includes prompts and spaces for daily thoughts.",
     price: 14.99,
     category: "journals",
@@ -119,6 +126,7 @@ export const mockProducts: Product[] = [
   {
     id: "journal-2",
     name: "Reading Journal",
+    slug: "reading-journal",
     description: "Track your reading journey with custom layouts. Perfect for book lovers and avid readers.",
     price: 12.99,
     category: "journals",
@@ -133,6 +141,7 @@ export const mockProducts: Product[] = [
   {
     id: "journal-3",
     name: "Gratitude Journal",
+    slug: "gratitude-journal",
     description: "Daily gratitude practice with beautiful prompts. Cultivate positivity and mindfulness.",
     price: 13.99,
     category: "journals",
@@ -149,6 +158,7 @@ export const mockProducts: Product[] = [
   {
     id: "scrap-1",
     name: "Baby Scrapbook",
+    slug: "baby-scrapbook",
     description:
       "Preserve precious baby memories with custom layouts. Perfect for documenting milestones and special moments.",
     price: 18.99,
@@ -164,6 +174,7 @@ export const mockProducts: Product[] = [
   {
     id: "scrap-2",
     name: "Couples Scrapbook",
+    slug: "couples-scrapbook",
     description:
       "Celebrate your love story with custom couple scrapbook. Perfect for anniversaries and special moments.",
     price: 21.99,
@@ -179,6 +190,7 @@ export const mockProducts: Product[] = [
   {
     id: "scrap-3",
     name: "Friendship Scrapbook",
+    slug: "friendship-scrapbook",
     description: "Capture friendship moments with custom designs. Perfect for best friends and group memories.",
     price: 17.99,
     category: "scrapbooks",
@@ -195,6 +207,7 @@ export const mockProducts: Product[] = [
   {
     id: "tool-1",
     name: "Decorative Tape Set",
+    slug: "decorative-tape-set",
     description: "Set of 12 decorative washi tapes in various pastel designs. Perfect for scrapbooking and crafting.",
     price: 9.99,
     category: "tools",
@@ -208,6 +221,7 @@ export const mockProducts: Product[] = [
   {
     id: "tool-2",
     name: "Highlighter Set",
+    slug: "highlighter-set",
     description: "Pastel highlighters in 8 beautiful colors. Perfect for journaling and note-taking.",
     price: 7.99,
     category: "tools",
@@ -221,6 +235,7 @@ export const mockProducts: Product[] = [
   {
     id: "tool-3",
     name: "Sticky Notes Collection",
+    slug: "sticky-notes-collection",
     description: "Assorted sticky notes in pastel colors and shapes. Perfect for organizing and decorating.",
     price: 6.99,
     category: "tools",
@@ -234,6 +249,7 @@ export const mockProducts: Product[] = [
   {
     id: "tool-4",
     name: "Stamp & Sticker Set",
+    slug: "stamp-sticker-set",
     description: "Beautiful stamps and stickers for decoration. Perfect for scrapbooking and journaling.",
     price: 11.99,
     category: "tools",
@@ -247,6 +263,7 @@ export const mockProducts: Product[] = [
   {
     id: "tool-5",
     name: "Gel Pen Collection",
+    slug: "gel-pen-collection",
     description: "Premium gel pens in 20 pastel shades. Perfect for writing and decorating.",
     price: 13.99,
     category: "tools",

@@ -18,6 +18,7 @@ export function AdminDashboard() {
     const newProduct = {
       id: `prod-${Date.now()}`,
       ...formData,
+      previousSlugs: [],
       stock: Number.parseInt(formData.stock),
       price: Number.parseFloat(formData.price),
     }
@@ -29,12 +30,21 @@ export function AdminDashboard() {
     setProducts(
       products.map((p) =>
         p._id === id
-          ? {
-              ...p,
-              ...formData,
-              stock: Number(formData.stock),
-              price: Number(formData.price),
-            }
+          ? ((): Product => {
+              const oldSlug = p.slug
+              const newSlug = formData.slug
+              const prev = p.previousSlugs ? [...p.previousSlugs] : []
+              if (newSlug && oldSlug && newSlug !== oldSlug && !prev.includes(oldSlug)) {
+                prev.push(oldSlug)
+              }
+              return {
+                ...p,
+                ...formData,
+                stock: Number(formData.stock),
+                price: Number(formData.price),
+                previousSlugs: prev,
+              }
+            })()
           : p,
       ),
     )
@@ -115,13 +125,13 @@ export function AdminDashboard() {
 
         {editingProduct && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-              <ProductForm
-                product={products.find((p) => p.id === editingProduct)}
-                onSubmit={(data) => handleUpdateProduct(editingProduct, data)}
-                onCancel={() => setEditingProduct(null)}
-              />
-            </Card>
+                  <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <ProductForm
+                      product={products.find((p) => p._id === editingProduct)}
+                      onSubmit={(data) => handleUpdateProduct(editingProduct as string, data)}
+                      onCancel={() => setEditingProduct(null)}
+                    />
+                  </Card>
           </div>
         )}
 
@@ -142,7 +152,7 @@ export function AdminDashboard() {
                 </thead>
                 <tbody>
                   {products.map((product) => (
-                    <tr key={product.id} className="border-b border-border hover:bg-muted/50">
+                    <tr key={product._id || product.id || product.slug} className="border-b border-border hover:bg-muted/50">
                       <td className="py-3 px-4">{product.name}</td>
                       <td className="py-3 px-4 capitalize">{product.category}</td>
                       <td className="py-3 px-4">${product.price}</td>

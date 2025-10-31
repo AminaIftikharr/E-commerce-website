@@ -15,6 +15,8 @@ export interface Product {
   seoDescription?: string
   createdAt?: string
   updatedAt?: string
+  slug?: string
+  previousSlugs?: string[]
 }
 
 export interface CartItem {
