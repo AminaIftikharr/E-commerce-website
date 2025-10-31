@@ -51,3 +51,13 @@ export interface User {
   name: string
   role: "customer" | "admin"
 }
+
+// Data shape used by product forms (everything except internal IDs)
+export type ProductFormData = Omit<
+  Product,
+  | "_id"
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+>
+

@@ -40,7 +40,7 @@ export function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
+              <Link key={link.href} href={link.href as any}>
                 <Button variant="ghost" size="sm" className="text-foreground hover:bg-muted">
                   {link.label}
                 </Button>
@@ -54,7 +54,7 @@ export function Navbar() {
               <>
                 <span className="text-sm text-muted-foreground hidden sm:inline">{currentUser.name}</span>
                 {isAdmin && (
-                  <Link href="/admin">
+                  <Link href={'/admin' as any}>
                     <Button variant="outline" size="sm" className="gap-2 bg-transparent hidden sm:flex">
                       <Settings className="w-4 h-4" />
                       Admin
@@ -100,7 +100,7 @@ export function Navbar() {
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 space-y-2 border-t border-border">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setMobileMenuOpen(false)}>
+              <Link key={link.href} href={link.href as any} onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" size="sm" className="w-full justify-start text-foreground">
                   {link.label}
                 </Button>

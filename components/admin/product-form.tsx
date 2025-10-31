@@ -109,7 +109,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
           <label className="text-sm font-medium mb-2 block">Category *</label>
           <select
             value={formData.category}
-            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value as Product['category'] })}
             className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="magazines">Magazines</option>
