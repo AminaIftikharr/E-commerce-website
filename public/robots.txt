@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /products/
+Allow: /magazines/
+Allow: /journals/
+Allow: /scrapbooks/
+Allow: /tools/
+Allow: /faq/
+Allow: /help/
+
+Disallow: /admin/
+Disallow: /api/
+Disallow: /setup/
+Disallow: /login/
+Disallow: /signup/
+
+Sitemap: https://https:/e-commerce-website-psi-six.vercel.app/sitemap.xml
