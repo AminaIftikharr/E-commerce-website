@@ -8,13 +8,23 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useStore } from "@/lib/store-context"
 import { Trash2, ArrowLeft, ShoppingBag } from "lucide-react"
-import { CheckoutForm, type CheckoutData } from "@/components/checkout-form"
+import { StripeCheckoutWrapper } from "@/components/stripe-checkout"
 
 export default function CartPage() {
   const router = useRouter()
   const { cart, removeFromCart, updateCart, clearCart, addOrder, products } = useStore()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [showCheckoutForm, setShowCheckoutForm] = useState(false)
+  const [customerInfo, setCustomerInfo] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    zipCode: "",
+  })
+  const [showPaymentForm, setShowPaymentForm] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
 
   const cartItems = cart.map((item) => ({
     ...item,
@@ -23,27 +33,51 @@ export default function CartPage() {
 
   const total = cartItems.reduce((sum, item) => sum + (item.product?.price || 0) * item.quantity, 0)
 
-  const handleCheckout = async (checkoutData: CheckoutData) => {
+  const validateCustomerInfo = () => {
+    const errors: Record<string, string> = {}
+    
+    if (!customerInfo.name.trim()) errors.name = "Name is required"
+    if (!customerInfo.email.trim()) errors.email = "Email is required"
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerInfo.email)) {
+      errors.email = "Invalid email format"
+    }
+    if (!customerInfo.phone.trim()) errors.phone = "Phone is required"
+    if (!customerInfo.address.trim()) errors.address = "Address is required"
+    if (!customerInfo.city.trim()) errors.city = "City is required"
+    if (!customerInfo.zipCode.trim()) errors.zipCode = "Zip code is required"
+
+    setFormErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const handleProceedToPayment = () => {
+    if (validateCustomerInfo()) {
+      setShowPaymentForm(true)
+    }
+  }
+
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  const handlePaymentSuccess = async (paymentIntentId: string) => {
     setIsCheckingOut(true)
     
     const order = {
       items: cart,
-      total: total * 1.1,
+      total: total * 1.1, // Including tax
       status: "pending" as const,
       createdAt: new Date().toISOString(),
       date: new Date().toISOString(),
-      customerName: checkoutData.customerName,
-      customerEmail: checkoutData.customerEmail,
-      customerPhone: checkoutData.customerPhone,
-      customerAddress: checkoutData.customerAddress,
-      customerCity: checkoutData.customerCity,
-      customerZipCode: checkoutData.customerZipCode,
-      paymentMethod: checkoutData.paymentMethod,
-      paymentStatus: "pending" as const,
+      customerName: customerInfo.name,
+      customerEmail: customerInfo.email,
+      customerPhone: customerInfo.phone,
+      customerAddress: customerInfo.address,
+      customerCity: customerInfo.city,
+      customerZipCode: customerInfo.zipCode,
+      paymentMethod: "credit-card" as const,
+      paymentStatus: "paid",
+      stripePaymentId: paymentIntentId,
     }
     
     try {
-      // First, create the order
       const orderResponse = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -52,54 +86,16 @@ export default function CartPage() {
       
       const orderData = await orderResponse.json()
       
-      if (!orderData.success || !orderData.data) {
-        alert("Failed to create order. Please try again.")
+      if (orderData.success && orderData.data) {
+        clearCart()
+        router.push(`/order-confirmation/${orderData.data._id}`)
+      } else {
+        alert("Failed to create order. Please contact support.")
         setIsCheckingOut(false)
-        return
       }
-
-      const createdOrder = orderData.data
-      const finalTotal = total * 1.1
-
-      // If payment method requires card details, process payment
-      if (checkoutData.paymentMethod === "credit-card" || checkoutData.paymentMethod === "debit-card") {
-        const paymentResponse = await fetch("/api/payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            orderId: createdOrder._id,
-            amount: finalTotal,
-            currency: "PKR",
-            paymentMethod: checkoutData.paymentMethod,
-            cardDetails: {
-              cardNumber: checkoutData.cardNumber || "",
-              expiry: checkoutData.cardExpiry || "",
-              cvc: checkoutData.cardCVC || "",
-            },
-          }),
-        })
-
-        const paymentData = await paymentResponse.json()
-
-        if (!paymentData.success) {
-          // Update order status to failed
-          await fetch(`/api/orders/${createdOrder._id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: "cancelled", paymentStatus: "failed" }),
-          })
-          alert("Payment failed. Please try again.")
-          setIsCheckingOut(false)
-          return
-        }
-      }
-
-      // Clear cart and redirect to confirmation
-      clearCart()
-      router.push(`/order-confirmation/${createdOrder._id}`)
     } catch (error) {
       console.error("Error creating order:", error)
-      alert("An error occurred. Please try again.")
+      alert("An error occurred. Please contact support.")
       setIsCheckingOut(false)
     }
   }
@@ -258,8 +254,132 @@ export default function CartPage() {
               </div>
             </>
           ) : (
-            <div className="max-w-2xl mx-auto">
-              <CheckoutForm onSubmit={handleCheckout} isLoading={isCheckingOut} />
+            <div className="max-w-2xl mx-auto space-y-8">
+              <h2 className="text-2xl font-bold">Checkout</h2>
+
+              {!showPaymentForm ? (
+                <div className="space-y-6">
+                  <Card className="p-6 space-y-4">
+                    <h3 className="text-lg font-semibold">Customer Information</h3>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Full Name *</label>
+                        <input
+                          type="text"
+                          value={customerInfo.name}
+                          onChange={(e) => setCustomerInfo({ ...customerInfo, name: e.target.value })}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                          placeholder="John Doe"
+                        />
+                        {formErrors.name && (
+                          <p className="text-sm text-destructive mt-1">{formErrors.name}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Email *</label>
+                        <input
+                          type="email"
+                          value={customerInfo.email}
+                          onChange={(e) => setCustomerInfo({ ...customerInfo, email: e.target.value })}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                          placeholder="john@example.com"
+                        />
+                        {formErrors.email && (
+                          <p className="text-sm text-destructive mt-1">{formErrors.email}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Phone *</label>
+                        <input
+                          type="tel"
+                          value={customerInfo.phone}
+                          onChange={(e) => setCustomerInfo({ ...customerInfo, phone: e.target.value })}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                          placeholder="+1 (555) 123-4567"
+                        />
+                        {formErrors.phone && (
+                          <p className="text-sm text-destructive mt-1">{formErrors.phone}</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Address *</label>
+                        <input
+                          type="text"
+                          value={customerInfo.address}
+                          onChange={(e) => setCustomerInfo({ ...customerInfo, address: e.target.value })}
+                          className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                          placeholder="123 Main St"
+                        />
+                        {formErrors.address && (
+                          <p className="text-sm text-destructive mt-1">{formErrors.address}</p>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">City *</label>
+                          <input
+                            type="text"
+                            value={customerInfo.city}
+                            onChange={(e) => setCustomerInfo({ ...customerInfo, city: e.target.value })}
+                            className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                            placeholder="New York"
+                          />
+                          {formErrors.city && (
+                            <p className="text-sm text-destructive mt-1">{formErrors.city}</p>
+                          )}
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium mb-2">Zip Code *</label>
+                          <input
+                            type="text"
+                            value={customerInfo.zipCode}
+                            onChange={(e) => setCustomerInfo({ ...customerInfo, zipCode: e.target.value })}
+                            className="w-full px-3 py-2 border border-border rounded-lg bg-background"
+                            placeholder="10001"
+                          />
+                          {formErrors.zipCode && (
+                            <p className="text-sm text-destructive mt-1">{formErrors.zipCode}</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Card className="p-6">
+                    <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Subtotal</span>
+                        <span>${total.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Tax (10%)</span>
+                        <span>${(total * 0.1).toFixed(2)}</span>
+                      </div>
+                      <div className="border-t pt-2 flex justify-between font-bold text-lg">
+                        <span>Total</span>
+                        <span>${(total * 1.1).toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </Card>
+
+                  <Button onClick={handleProceedToPayment} className="w-full" size="lg">
+                    Proceed to Payment
+                  </Button>
+                </div>
+              ) : (
+                <StripeCheckoutWrapper
+                  amount={total * 1.1}
+                  onSuccess={handlePaymentSuccess}
+                  customerInfo={customerInfo}
+                />
+              )}
             </div>
           )}
         </div>
