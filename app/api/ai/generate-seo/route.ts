@@ -1,5 +1,30 @@
 import { NextRequest, NextResponse } from "next/server"
-import { GoogleGenerativeAI } from "@google/generative-ai"
+
+// Simple SEO generation function as fallback
+function generateBasicSEO(title: string, description: string, category: string) {
+  const categoryKeywords: Record<string, string[]> = {
+    magazines: ["custom magazine", "personalized magazine", "magazine printing", "photo magazine"],
+    journals: ["custom journal", "personalized journal", "writing journal", "diary"],
+    scrapbooks: ["custom scrapbook", "memory book", "photo album", "keepsake book"],
+    tools: ["craft supplies", "scrapbooking tools", "craft materials", "DIY tools"],
+  }
+
+  const baseKeywords = categoryKeywords[category as keyof typeof categoryKeywords] || []
+  const titleWords = title.toLowerCase().split(' ').filter(w => w.length > 3)
+  const descWords = description.toLowerCase().split(' ').slice(0, 20).filter(w => w.length > 4)
+
+  const seoTitle = `${title} - Custom ${category.slice(0, -1)} | MyJourmals`.slice(0, 60)
+  const seoDescription = description.slice(0, 157) + '...'
+  const keywords = [
+    ...baseKeywords,
+    `custom ${title.toLowerCase()}`,
+    `personalized ${title.toLowerCase()}`,
+    ...titleWords.slice(0, 3),
+    ...descWords.slice(0, 3),
+  ].slice(0, 10)
+
+  return { seoTitle, seoDescription, keywords }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,67 +38,80 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const apiKey = process.env.GOOGLE_AI_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        { success: false, error: "Google AI API key not configured" },
-        { status: 500 }
-      )
+    const apiKey = process.env.DIGITALOCEAN_AI_API_KEY
+    
+    // Try AI generation if API key is available
+    if (apiKey) {
+      try {
+        const prompt = `Generate SEO content in JSON format for:
+Title: ${title}
+Description: ${description}
+Category: ${category}
+
+Return only JSON with: seoTitle (max 60 chars), seoDescription (max 160 chars), keywords (array of 8-10 keywords)`
+
+        const response = await fetch(
+          "https://api.sambanova.ai/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${apiKey}`,
+            },
+            body: JSON.stringify({
+              model: "Meta-Llama-3.1-8B-Instruct",
+              messages: [
+                {
+                  role: "system",
+                  content: "You are an SEO expert. Always respond with valid JSON only.",
+                },
+                {
+                  role: "user",
+                  content: prompt,
+                },
+              ],
+              temperature: 0.7,
+              max_tokens: 500,
+            }),
+          }
+        )
+
+        if (response.ok) {
+          const result = await response.json()
+          const responseText = result.choices?.[0]?.message?.content || ""
+
+          if (responseText) {
+            try {
+              const jsonText = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
+              const seoData = JSON.parse(jsonText)
+
+              return NextResponse.json({
+                success: true,
+                data: {
+                  seoTitle: seoData.seoTitle || "",
+                  seoDescription: seoData.seoDescription || "",
+                  keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
+                },
+              })
+            } catch (parseError) {
+              console.log("AI response parse failed, using fallback")
+            }
+          }
+        }
+      } catch (aiError) {
+        console.log("AI generation failed, using fallback:", aiError)
+      }
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" })
-
-    const prompt = `You are an SEO expert for an e-commerce store selling custom ${category || "products"}.
-
-Product Title: ${title}
-Product Description: ${description}
-
-Generate SEO-optimized content in JSON format with these exact fields:
-1. seoTitle: An engaging, SEO-friendly title (max 60 characters) that includes primary keywords
-2. seoDescription: A compelling meta description (max 160 characters) that encourages clicks
-3. keywords: An array of 8-12 relevant SEO keywords and phrases
-
-Important:
-- Focus on search intent and user benefits
-- Include product type, features, and use cases in keywords
-- Make the seoTitle and seoDescription compelling for clicks
-- Return ONLY valid JSON, no markdown, no explanation
-
-Example format:
-{
-  "seoTitle": "Custom Wedding Magazine - Personalized Wedding Planner",
-  "seoDescription": "Create your dream wedding magazine with custom colors, designs & personal touches. Perfect keepsake for your special day.",
-  "keywords": ["custom wedding magazine", "personalized wedding planner", "wedding memory book", "custom wedding keepsake", "personalized bridal magazine", "wedding planning journal", "custom wedding gift", "personalized wedding memories"]
-}`
-
-    const result = await model.generateContent(prompt)
-    const responseText = result.response.text()
-
-    // Parse the AI response - handle both JSON and markdown-wrapped JSON
-    let seoData
-    try {
-      // Remove markdown code blocks if present
-      const jsonText = responseText.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim()
-      seoData = JSON.parse(jsonText)
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", responseText)
-      return NextResponse.json(
-        { success: false, error: "Failed to parse AI response. Please try again." },
-        { status: 500 }
-      )
-    }
-
+    // Fallback to basic SEO generation
+    const seoData = generateBasicSEO(title, description, category)
+    
     return NextResponse.json({
       success: true,
-      data: {
-        seoTitle: seoData.seoTitle || "",
-        seoDescription: seoData.seoDescription || "",
-        keywords: Array.isArray(seoData.keywords) ? seoData.keywords : [],
-      },
+      data: seoData,
     })
   } catch (error: any) {
-    console.error("AI SEO Generation Error:", error)
+    console.error("SEO Generation Error:", error)
     return NextResponse.json(
       { success: false, error: error.message || "Failed to generate SEO content" },
       { status: 500 }
