@@ -39,6 +39,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const refreshProducts = async () => {
     try {
       const response = await fetch("/api/products")
+      const contentType = response.headers.get("content-type") || ""
+      if (!response.ok || !contentType.includes("application/json")) {
+        const text = await response.text()
+        console.error("Products API returned non-JSON or error:", response.status, text.slice(0, 200))
+        return
+      }
       const data = await response.json()
       if (data.success) {
         setProducts(data.data)
@@ -52,6 +58,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const refreshOrders = async () => {
     try {
       const response = await fetch("/api/orders")
+      const contentType = response.headers.get("content-type") || ""
+      if (!response.ok || !contentType.includes("application/json")) {
+        const text = await response.text()
+        console.error("Orders API returned non-JSON or error:", response.status, text.slice(0, 200))
+        return
+      }
       const data = await response.json()
       if (data.success) {
         setOrders(data.data)

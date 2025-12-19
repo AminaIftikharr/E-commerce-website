@@ -112,7 +112,19 @@ export default function HomePageClient() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {products.length === 0 ? (
+              <div className="col-span-1 sm:col-span-2 lg:col-span-3">
+                <div className="border border-border rounded-xl p-8 text-center bg-muted/20">
+                  <p className="text-lg font-medium mb-2">No products found</p>
+                  <p className="text-sm text-muted-foreground mb-4">If this is a fresh setup, initialize the database.</p>
+                  <div className="flex justify-center gap-3">
+                    <Link href="/setup" className="underline underline-offset-4">Open Setup</Link>
+                    <Link href="/api/init" className="underline underline-offset-4">Quick Init</Link>
+                  </div>
+                </div>
+              </div>
+            ) : (
+            products.map((product) => (
               <Link key={product._id || product.id} href={`/product/${product._id || product.id || product.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden group">
                   <div className="aspect-square bg-muted overflow-hidden">
@@ -145,7 +157,8 @@ export default function HomePageClient() {
                   </div>
                 </Card>
               </Link>
-            ))}
+            ))
+            )}
           </div>
         </div>
       </section>
