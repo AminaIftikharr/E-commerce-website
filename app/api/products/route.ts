@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import connectDB from "@/lib/mongodb"
 import Product from "@/lib/models/Product"
+import { mockProducts } from "@/lib/mock-data"
 
 // GET all products
 export async function GET(request: NextRequest) {
@@ -29,7 +30,14 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ success: true, data: products }, { status: 200 })
   } catch (error) {
-    console.error("Error fetching products:", error)
+    console.error("Error fetching products from database:", error)
+    
+    // DEV FALLBACK: Return mock products if database fails (development only)
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠️ Database failed, serving mock products for development")
+      return NextResponse.json({ success: true, data: mockProducts, dev: true }, { status: 200 })
+    }
+    
     return NextResponse.json({ success: false, error: "Failed to fetch products" }, { status: 500 })
   }
 }

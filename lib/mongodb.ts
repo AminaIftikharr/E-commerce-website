@@ -1,10 +1,7 @@
 import mongoose from "mongoose"
 
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/ecommerce"
-
-if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable inside .env.local")
-}
+const PRIMARY_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/ecommerce"
+const FALLBACK_URI = process.env.MONGODB_FALLBACK_URI || "mongodb://127.0.0.1:27017/ecommerce"
 
 interface MongooseCache {
   conn: typeof mongoose | null
@@ -31,10 +28,25 @@ async function connectDB() {
       bufferCommands: false,
     }
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("✅ MongoDB connected successfully")
-      return mongoose
-    })
+    // Try primary URI first; on failure, try local fallback
+    cached.promise = mongoose
+      .connect(PRIMARY_URI, opts)
+      .then((m) => {
+        console.log("✅ MongoDB connected successfully")
+        return m
+      })
+      .catch(async (err) => {
+        console.error("❌ Primary MongoDB connection failed:", err?.message || err)
+        console.warn("Attempting fallback local MongoDB at", FALLBACK_URI)
+        try {
+          const m2 = await mongoose.connect(FALLBACK_URI, opts)
+          console.log("✅ Fallback MongoDB connected successfully")
+          return m2
+        } catch (err2) {
+          console.error("❌ Fallback MongoDB connection failed:", err2?.message || err2)
+          throw err2
+        }
+      })
   }
 
   try {

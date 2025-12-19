@@ -1,44 +1,53 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://localhost:3000/</loc>
-    <lastmod>2023-10-31</lastmod>
+    <loc>https://www.myjourmals.me</loc>
+    <lastmod>2025-12-19</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/products</loc>
-    <changefreq>daily</changefreq>
+    <loc>https://www.myjourmals.me/magazines</loc>
+    <lastmod>2025-12-19</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/magazines</loc>
+    <loc>https://www.myjourmals.me/journals</loc>
+    <lastmod>2025-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.myjourmals.me/scrapbooks</loc>
+    <lastmod>2025-12-19</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.myjourmals.me/tools</loc>
+    <lastmod>2025-12-19</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/journals</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://your-domain.com/scrapbooks</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://your-domain.com/tools</loc>
+    <loc>https://www.myjourmals.me/faq</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/faq</loc>
+    <loc>https://www.myjourmals.me/help</loc>
     <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://www.myjourmals.me/privacy</loc>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://your-domain.com/help</loc>
-    <changefreq>monthly</changefreq>
+    <loc>https://www.myjourmals.me/terms</loc>
+    <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 </urlset>

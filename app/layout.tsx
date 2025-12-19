@@ -11,25 +11,25 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('http://localhost:3000'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.myjourmals.me'),
   title: {
-    default: 'Craft Memories - Creative Supplies Store',
-    template: '%s | Craft Memories'
+    default: 'My Journalss - Custom Journals, Magazines & Scrapbooks',
+    template: '%s | My Journals'
   },
-  description: 'Find the best crafting supplies, magazines, journals and scrapbooking materials at Craft Memories.',
-  keywords: ['craft supplies', 'scrapbooking', 'journals', 'magazines', 'DIY crafts'],
-  authors: [{ name: 'Craft Memories' }],
+  description: 'Create personalized journals, custom magazines, and scrapbooks. Premium craft supplies for your memories at My Journals.',
+  keywords: ['custom journals', 'personalized magazines', 'scrapbooks', 'craft supplies', 'DIY crafts', 'memory books'],
+  authors: [{ name: 'My Journals' }],
   openGraph: {
-    title: 'Craft Memories',
-    description: 'Your one-stop shop for creative supplies',
-    url: 'http://localhost:3000',
-    siteName: 'Craft Memories',
+    title: 'My Journals - Custom Journals & Magazines',
+    description: 'Create beautiful, personalized journals, magazines, and scrapbooks for your precious memories',
+    url: 'https://www.myjourmals.me',
+    siteName: 'My Journals',
     images: [
       {
         url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'Craft Memories Store'
+        alt: 'My Journals Store'
       }
     ],
     locale: 'en_US',
@@ -44,9 +44,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preload" href="/fonts/main-font.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
-      </head>
       <body className={`font-sans antialiased`}>
         <StoreProvider>
           <Navbar />
