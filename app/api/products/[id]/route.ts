@@ -3,11 +3,10 @@ import connectDB from "@/lib/mongodb"
 import Product from "@/lib/models/Product"
 
 // GET single product by ID
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB()
-
-    const { id } = await params
+    const { id } = params
     const product = await Product.findById(id)
 
     if (!product) {
@@ -22,11 +21,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // PUT update product
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB()
-
-    const { id } = await params
+    const { id } = params
     const body = await request.json()
     const product = await Product.findByIdAndUpdate(id, body, {
       new: true,
@@ -45,11 +43,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 // DELETE product
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB()
-
-    const { id } = await params
+    const { id } = params
     const product = await Product.findByIdAndDelete(id)
 
     if (!product) {
