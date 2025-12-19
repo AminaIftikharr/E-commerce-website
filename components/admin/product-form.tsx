@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import type { Product } from "@/lib/types"
 import { mockProducts } from "@/lib/mock-data"
-import { X, Upload } from "lucide-react"
+import { X, Upload, Sparkles } from "lucide-react"
 
 interface ProductFormProps {
   product?: Product
@@ -30,6 +30,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
   })
 
   const [imagePreview, setImagePreview] = useState<string>(product?.image || "")
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false)
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -41,6 +42,44 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
         setFormData({ ...formData, image: result })
       }
       reader.readAsDataURL(file)
+    }
+  }
+
+  const handleGenerateAISEO = async () => {
+    if (!formData.name || !formData.description) {
+      alert("Please enter product name and description first")
+      return
+    }
+
+    setIsGeneratingAI(true)
+    try {
+      const response = await fetch("/api/ai/generate-seo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: formData.name,
+          description: formData.description,
+          category: formData.category,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success && result.data) {
+        setFormData({
+          ...formData,
+          seoTitle: result.data.seoTitle || "",
+          seoDescription: result.data.seoDescription || "",
+          keywords: result.data.keywords?.join(", ") || "",
+        })
+      } else {
+        alert(result.error || "Failed to generate SEO content")
+      }
+    } catch (error) {
+      console.error("AI SEO generation error:", error)
+      alert("Failed to generate SEO content. Please try again.")
+    } finally {
+      setIsGeneratingAI(false)
     }
   }
 
@@ -179,7 +218,20 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
 
       {/* SEO Section */}
       <div className="border-t border-border pt-4">
-        <h3 className="font-semibold mb-3">SEO Information</h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold">SEO Information</h3>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={handleGenerateAISEO}
+            disabled={isGeneratingAI || !formData.name || !formData.description}
+            className="gap-2"
+          >
+            <Sparkles className="w-4 h-4" />
+            {isGeneratingAI ? "Generating..." : "Generate with AI"}
+          </Button>
+        </div>
         <div className="space-y-3">
           <div>
             <label className="text-sm font-medium mb-2 block">SEO Title</label>
@@ -190,6 +242,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
               placeholder="e.g., Custom Wedding Magazine - Personalized Wedding Planner"
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
             />
+            <p className="text-xs text-muted-foreground mt-1">{formData.seoTitle.length}/60 characters</p>
           </div>
 
           <div>
@@ -201,6 +254,7 @@ export function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
               className="w-full px-3 py-2 rounded-lg border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               rows={2}
             />
+            <p className="text-xs text-muted-foreground mt-1">{formData.seoDescription.length}/160 characters</p>
           </div>
 
           <div>
