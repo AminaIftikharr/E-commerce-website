@@ -3,7 +3,6 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    domains: ['www.myjourmals.me', 'myjourmals.me'],
     remotePatterns: [
       { protocol: 'https', hostname: '**' },
       { protocol: 'http', hostname: 'localhost' },
@@ -15,6 +14,11 @@ const nextConfig = {
   compress: true,
   poweredByHeader: false,
   reactStrictMode: true,
+  async rewrites() {
+    return [
+      { source: '/favicon.ico', destination: '/placeholder-logo.png' },
+    ]
+  },
   async headers() {
     return [
       {

@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     
     // DEV FALLBACK: Return mock products if database fails (development only)
     if (process.env.NODE_ENV === "development") {
-      console.warn("⚠️ Database failed, serving mock products for development")
+      console.warn("WARNING: Database failed, serving mock products for development")
       return NextResponse.json({ success: true, data: mockProducts, dev: true }, { status: 200 })
     }
     

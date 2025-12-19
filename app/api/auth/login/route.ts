@@ -4,14 +4,20 @@ import User from "@/lib/models/User"
 
 // POST login
 export async function POST(request: NextRequest) {
+  let email = ""
+  let password = ""
+  
   try {
-    await connectDB()
-
-    const { email, password } = await request.json()
+    // Parse request body first
+    const body = await request.json()
+    email = body.email
+    password = body.password
 
     if (!email || !password) {
       return NextResponse.json({ success: false, error: "Email and password are required" }, { status: 400 })
     }
+
+    await connectDB()
 
     // Find user by email
     const user = await User.findOne({ email: email.toLowerCase() })
@@ -38,12 +44,11 @@ export async function POST(request: NextRequest) {
     console.error("Error logging in:", error)
     if (process.env.NODE_ENV === "development") {
       // Dev fallback to keep site functional without DB
-      console.warn("⚠️ DB unavailable, serving mock login user (development)")
-      const { email } = await request.json().catch(() => ({ email: "dev@example.com" }))
+      console.warn("WARNING: DB unavailable, serving mock login user (development)")
       const mockUser = {
-        id: "dev-user-id",
-        email: (email || "dev@example.com").toLowerCase(),
-        name: "Developer",
+        id: "dev-admin-id",
+        email: email || "admin@craftmemories.com",
+        name: "Admin (Dev)",
         role: "admin" as const,
       }
       return NextResponse.json({ success: true, data: mockUser, dev: true }, { status: 200 })
