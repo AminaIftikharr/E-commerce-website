@@ -39,25 +39,64 @@ export default function CartPage() {
       customerCity: checkoutData.customerCity,
       customerZipCode: checkoutData.customerZipCode,
       paymentMethod: checkoutData.paymentMethod,
+      paymentStatus: "pending" as const,
     }
     
     try {
-      const response = await fetch("/api/orders", {
+      // First, create the order
+      const orderResponse = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(order),
       })
       
-      const data = await response.json()
+      const orderData = await orderResponse.json()
       
-      if (data.success && data.data) {
-        clearCart()
-        // Use the MongoDB _id from the created order
-        router.push(`/order-confirmation/${data.data._id}`)
-      } else {
+      if (!orderData.success || !orderData.data) {
         alert("Failed to create order. Please try again.")
         setIsCheckingOut(false)
+        return
       }
+
+      const createdOrder = orderData.data
+      const finalTotal = total * 1.1
+
+      // If payment method requires card details, process payment
+      if (checkoutData.paymentMethod === "credit-card" || checkoutData.paymentMethod === "debit-card") {
+        const paymentResponse = await fetch("/api/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: createdOrder._id,
+            amount: finalTotal,
+            currency: "PKR",
+            paymentMethod: checkoutData.paymentMethod,
+            cardDetails: {
+              cardNumber: checkoutData.cardNumber || "",
+              expiry: checkoutData.cardExpiry || "",
+              cvc: checkoutData.cardCVC || "",
+            },
+          }),
+        })
+
+        const paymentData = await paymentResponse.json()
+
+        if (!paymentData.success) {
+          // Update order status to failed
+          await fetch(`/api/orders/${createdOrder._id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "cancelled", paymentStatus: "failed" }),
+          })
+          alert("Payment failed. Please try again.")
+          setIsCheckingOut(false)
+          return
+        }
+      }
+
+      // Clear cart and redirect to confirmation
+      clearCart()
+      router.push(`/order-confirmation/${createdOrder._id}`)
     } catch (error) {
       console.error("Error creating order:", error)
       alert("An error occurred. Please try again.")

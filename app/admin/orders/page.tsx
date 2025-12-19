@@ -8,15 +8,29 @@ import { ChevronDown, Trash2 } from "lucide-react"
 
 export default function OrdersPage() {
   const router = useRouter()
-  const { currentUser, isAdmin, orders, updateOrder, deleteOrder } = useStore()
+  const { currentUser, isAdmin, orders, updateOrder, deleteOrder, refreshOrders } = useStore()
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null)
   const [selectedStatus, setSelectedStatus] = useState<Record<string, string>>({})
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (!currentUser || !isAdmin) {
       router.push("/login")
+      return
     }
+    
+    // Fetch latest orders when admin page loads
+    const loadOrders = async () => {
+      setLoading(true)
+      await refreshOrders()
+      setLoading(false)
+    }
+    
+    loadOrders()
+  }, [currentUser, isAdmin, router, refreshOrders])
+
+  useEffect(() => {
     const initialStatus: Record<string, string> = {}
     orders.forEach((order) => {
       const orderId = order._id?.toString() || order.id || ""
@@ -25,7 +39,7 @@ export default function OrdersPage() {
       }
     })
     setSelectedStatus(initialStatus)
-  }, [currentUser, isAdmin, router, orders])
+  }, [orders])
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     setSelectedStatus((prev) => ({ ...prev, [orderId]: newStatus }))
@@ -52,10 +66,24 @@ export default function OrdersPage() {
   return (
     <main className="min-h-screen bg-background">
       <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2">Orders Management</h1>
-          <p className="text-muted-foreground">View and manage customer orders with tracking</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold mb-2">Orders Management</h1>
+            <p className="text-muted-foreground">View and manage all customer orders</p>
+          </div>
+          <button
+            onClick={() => refreshOrders()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:opacity-90"
+          >
+            Refresh Orders
+          </button>
         </div>
+
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading orders...</p>
+          </div>
+        ) : null}
 
         {/* Orders List */}
         <div className="space-y-4">
@@ -71,7 +99,7 @@ export default function OrdersPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-4 mb-2">
-                        <h3 className="font-mono text-sm font-bold">{orderId}</h3>
+                        <h3 className="font-mono text-sm font-bold">{orderId.slice(-12)}</h3>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[order.status]}`}>
                           {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         </span>
@@ -84,10 +112,13 @@ export default function OrdersPage() {
                           <strong>Items:</strong> {order.items.length}
                         </span>
                         <span>
-                          <strong>Total:</strong> ${order.total.toFixed(2)}
+                          <strong>Total:</strong> Rs {order.total.toLocaleString()}
                         </span>
                         <span>
-                          <strong>Date:</strong> {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "N/A"}
+                          <strong>Payment:</strong> {order.paymentMethod.replace("-", " ")}
+                        </span>
+                        <span>
+                          <strong>Date:</strong> {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : new Date(order.date || "").toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -161,11 +192,31 @@ export default function OrdersPage() {
                       </div>
                     </div>
 
-                    {/* Payment Information */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Payment & Order Information */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <h4 className="font-semibold mb-3">Payment Method</h4>
                         <p className="text-sm capitalize">{order.paymentMethod.replace("-", " ")}</p>
+                        {(order as any).paymentStatus && (
+                          <p className="text-xs text-muted-foreground mt-2">
+                            Status: <span className="capitalize">{(order as any).paymentStatus}</span>
+                          </p>
+                        )}
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold mb-3">Order Date</h4>
+                        <p className="text-sm">
+                          {order.createdAt
+                            ? new Date(order.createdAt).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })
+                            : "N/A"}
+                        </p>
                       </div>
 
                       <div>

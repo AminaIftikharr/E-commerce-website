@@ -59,6 +59,11 @@ const OrderSchema = new Schema(
       default: "cash-on-delivery",
       required: true,
     },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "confirmed", "failed", "refunded"],
+      default: "pending",
+    },
     userId: {
       type: Schema.Types.ObjectId,
       ref: "User",

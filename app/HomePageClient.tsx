@@ -5,26 +5,14 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useStore } from "@/lib/store-context"
-import { ShoppingCart, Sparkles, BookOpen, Heart, ArrowRight } from "lucide-react"
+import { ShoppingCart, Sparkles, ArrowRight } from "lucide-react"
 
 export default function HomePageClient() {
   const { products } = useStore()
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
-
-  const categories = [
-    { id: "all", label: "All Products", icon: Sparkles },
-    { id: "magazines", label: "Magazines", icon: BookOpen },
-    { id: "journals", label: "Journals", icon: BookOpen },
-    { id: "scrapbooks", label: "Scrapbooks", icon: Heart },
-    { id: "tools", label: "Tools & Supplies", icon: ShoppingCart },
-  ]
-
-  const filteredProducts =
-    selectedCategory === "all" ? products : products.filter((p) => p.category === selectedCategory)
 
   return (
     <main className="min-h-screen bg-background">
-      <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-secondary/10 pt-20 pb-16 sm:pt-32 sm:pb-24">
+      <section className="relative overflow-hidden bg-linear-to-br from-background via-background to-secondary/10 pt-20 pb-16 sm:pt-32 sm:pb-24">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -z-10"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl -z-10"></div>
@@ -41,7 +29,7 @@ export default function HomePageClient() {
                 </div>
                 <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-balance leading-tight">
                   Create Your Perfect{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                  <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-secondary">
                     Memories
                   </span>
                 </h1>
@@ -88,7 +76,7 @@ export default function HomePageClient() {
             <div className="relative hidden lg:block">
               <div className="relative aspect-square">
                 {/* Main hero image */}
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-3xl overflow-hidden">
+                <div className="absolute inset-0 bg-linear-to-br from-primary/20 to-secondary/20 rounded-3xl overflow-hidden">
                   <img
                     src="/premium-customized-journal-magazine-scrapbook-coll.jpg"
                     alt="Premium journals and magazines collection"
@@ -114,26 +102,6 @@ export default function HomePageClient() {
         </div>
       </section>
 
-      {/* Category Filter */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex flex-wrap gap-3 justify-center">
-          {categories.map((cat) => {
-            const Icon = cat.icon
-            return (
-              <Button
-                key={cat.id}
-                variant={selectedCategory === cat.id ? "default" : "outline"}
-                onClick={() => setSelectedCategory(cat.id)}
-                className="gap-2"
-              >
-                <Icon className="w-4 h-4" />
-                {cat.label}
-              </Button>
-            )
-          })}
-        </div>
-      </section>
-
       {/* Products Grid */}
       <section id="products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="space-y-8">
@@ -144,8 +112,8 @@ export default function HomePageClient() {
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map((product) => (
-              <Link key={product._id || product.id} href={`/product/${product._id || product.id}`}>
+            {products.map((product) => (
+              <Link key={product._id || product.id} href={`/product/${product._id || product.id || product.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer overflow-hidden group">
                   <div className="aspect-square bg-muted overflow-hidden">
                     <img

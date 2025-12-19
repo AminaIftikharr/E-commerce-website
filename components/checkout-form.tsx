@@ -19,7 +19,10 @@ export interface CheckoutData {
   customerAddress: string
   customerCity: string
   customerZipCode: string
-  paymentMethod: "cash-on-delivery"
+  paymentMethod: "cash-on-delivery" | "credit-card" | "debit-card" | "paypal" | "bank-transfer"
+  cardNumber?: string
+  cardExpiry?: string
+  cardCVC?: string
 }
 
 export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps) {
@@ -31,6 +34,9 @@ export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps)
     customerCity: "",
     customerZipCode: "",
     paymentMethod: "cash-on-delivery",
+    cardNumber: "",
+    cardExpiry: "",
+    cardCVC: "",
   })
 
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -168,16 +174,82 @@ export function CheckoutForm({ onSubmit, isLoading = false }: CheckoutFormProps)
           <h3 className="font-semibold text-lg">Payment Method</h3>
 
           <div className="space-y-3">
-            <div className="flex items-center gap-3 p-4 border-2 border-primary rounded-lg bg-primary/5">
-              <div className="w-5 h-5 rounded-full border-2 border-primary bg-primary flex items-center justify-center">
-                <div className="w-2 h-2 rounded-full bg-white"></div>
-              </div>
+            {[
+              { id: "cash-on-delivery", label: "Cash on Delivery", desc: "Pay when you receive your order" },
+              { id: "credit-card", label: "Credit Card", desc: "Visa, MasterCard, American Express" },
+              { id: "debit-card", label: "Debit Card", desc: "Direct bank transfer" },
+              { id: "bank-transfer", label: "Bank Transfer", desc: "Direct transfer to our account" },
+              { id: "paypal", label: "PayPal", desc: "Pay securely with your PayPal account" },
+            ].map((method) => (
+              <button
+                key={method.id}
+                type="button"
+                onClick={() => setFormData({ ...formData, paymentMethod: method.id as any })}
+                className={`w-full flex items-center gap-3 p-4 border-2 rounded-lg transition-all ${
+                  formData.paymentMethod === method.id
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:border-muted-foreground"
+                }`}
+              >
+                <div
+                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                    formData.paymentMethod === method.id
+                      ? "border-primary bg-primary"
+                      : "border-muted-foreground"
+                  }`}
+                >
+                  {formData.paymentMethod === method.id && (
+                    <div className="w-2 h-2 rounded-full bg-primary-foreground"></div>
+                  )}
+                </div>
+                <div className="text-left">
+                  <span className="font-semibold block">{method.label}</span>
+                  <span className="text-sm text-muted-foreground">{method.desc}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Card Details for Credit/Debit Card */}
+          {(formData.paymentMethod === "credit-card" || formData.paymentMethod === "debit-card") && (
+            <div className="p-4 border border-primary/30 rounded-lg bg-primary/5 space-y-4 mt-4">
               <div>
-                <span className="font-semibold block">Cash on Delivery</span>
-                <span className="text-sm text-muted-foreground">Pay when you receive your order</span>
+                <label className="block text-sm font-medium mb-2">Card Number</label>
+                <input
+                  type="text"
+                  placeholder="1234 5678 9012 3456"
+                  maxLength={19}
+                  value={formData.cardNumber}
+                  onChange={(e) => setFormData({ ...formData, cardNumber: e.target.value })}
+                  className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Expiry Date</label>
+                  <input
+                    type="text"
+                    placeholder="MM/YY"
+                    maxLength={5}
+                    value={formData.cardExpiry}
+                    onChange={(e) => setFormData({ ...formData, cardExpiry: e.target.value })}
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">CVC</label>
+                  <input
+                    type="text"
+                    placeholder="123"
+                    maxLength={4}
+                    value={formData.cardCVC}
+                    onChange={(e) => setFormData({ ...formData, cardCVC: e.target.value })}
+                    className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Info Alert */}
