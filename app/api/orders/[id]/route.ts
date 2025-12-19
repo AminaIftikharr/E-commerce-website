@@ -8,6 +8,22 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     await connectDB()
 
     const { id } = await params
+    
+    // Development fallback for dev-order-id
+    if (process.env.NODE_ENV === "development" && id === "dev-order-id") {
+      const mockOrder = {
+        _id: "dev-order-id",
+        items: [],
+        total: 0,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        customerName: "Development User",
+        customerEmail: "dev@example.com",
+        paymentStatus: "paid",
+      }
+      return NextResponse.json({ success: true, data: mockOrder, dev: true }, { status: 200 })
+    }
+    
     const order = await Order.findById(id).populate("items.productId")
 
     if (!order) {
@@ -17,6 +33,20 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({ success: true, data: order }, { status: 200 })
   } catch (error) {
     console.error("Error fetching order:", error)
+    if (process.env.NODE_ENV === "development") {
+      console.warn("WARNING: DB unavailable, returning mock order (development)")
+      const mockOrder = {
+        _id: "dev-order-id",
+        items: [],
+        total: 0,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+        customerName: "Development User",
+        customerEmail: "dev@example.com",
+        paymentStatus: "paid",
+      }
+      return NextResponse.json({ success: true, data: mockOrder, dev: true }, { status: 200 })
+    }
     return NextResponse.json({ success: false, error: "Failed to fetch order" }, { status: 500 })
   }
 }

@@ -14,6 +14,10 @@ import { Loader2 } from "lucide-react"
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
+const appearance = {
+  theme: 'stripe' as const,
+}
+
 interface PaymentFormProps {
   amount: number
   onSuccess: (paymentIntentId: string) => void
@@ -137,7 +141,7 @@ export function StripeCheckoutWrapper({
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount,
-            currency: "usd",
+            currency: "pkr",
             metadata: {
               customerName: customerInfo.name,
               customerEmail: customerInfo.email,

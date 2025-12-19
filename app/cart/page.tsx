@@ -25,6 +25,7 @@ export default function CartPage() {
   })
   const [showPaymentForm, setShowPaymentForm] = useState(false)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card")
 
   const cartItems = cart.map((item) => ({
     ...item,
@@ -52,11 +53,56 @@ export default function CartPage() {
 
   const handleProceedToPayment = () => {
     if (validateCustomerInfo()) {
-      setShowPaymentForm(true)
+      if (paymentMethod === "cod") {
+        handleCashOnDelivery()
+      } else {
+        setShowPaymentForm(true)
+      }
     }
   }
 
-  const handlePaymentSuccess = async (paymentIntentId: string) => {
+  const handleCashOnDelivery = async () => {
+    setIsCheckingOut(true)
+    
+    const order = {
+      items: cart,
+      total: total * 1.1,
+      status: "pending" as const,
+      createdAt: new Date().toISOString(),
+      date: new Date().toISOString(),
+      customerName: customerInfo.name,
+      customerEmail: customerInfo.email,
+      customerPhone: customerInfo.phone,
+      customerAddress: customerInfo.address,
+      customerCity: customerInfo.city,
+      customerZipCode: customerInfo.zipCode,
+      paymentMethod: "cash-on-delivery" as const,
+      paymentStatus: "pending",
+    }
+    
+    try {
+      const orderResponse = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order),
+      })
+      
+      const orderData = await orderResponse.json()
+      
+      if (orderData.success && orderData.data) {
+        clearCart()
+        router.push(`/order-confirmation/${orderData.data._id}`)
+      } else {
+        alert("Failed to create order. Please contact support.")
+        setIsCheckingOut(false)
+      }
+    } catch (error) {
+      console.error("Error creating order:", error)
+      alert("An error occurred. Please contact support.")
+      setIsCheckingOut(false)
+    }
+  }
+
   const handlePaymentSuccess = async (paymentIntentId: string) => {
     setIsCheckingOut(true)
     
@@ -195,7 +241,7 @@ export default function CartPage() {
                               />
                             </div>
                             <span className="font-semibold">
-                              Rs {((item.product?.price || 0) * item.quantity).toLocaleString()}
+                              Rs. {((item.product?.price || 0) * item.quantity).toLocaleString()}
                             </span>
                             <button
                               onClick={() => removeFromCart(item.productId)}
@@ -218,7 +264,7 @@ export default function CartPage() {
                     <div className="space-y-2 border-t border-border pt-4">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Subtotal:</span>
-                        <span>Rs {total.toLocaleString()}</span>
+                        <span>Rs. {total.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Shipping:</span>
@@ -226,13 +272,13 @@ export default function CartPage() {
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Tax:</span>
-                        <span>Rs {(total * 0.1).toLocaleString()}</span>
+                        <span>Rs. {(total * 0.1).toLocaleString()}</span>
                       </div>
                     </div>
 
                     <div className="border-t border-border pt-4 flex justify-between font-bold text-lg">
                       <span>Total:</span>
-                      <span className="text-primary">Rs {(total * 1.1).toLocaleString()}</span>
+                      <span className="text-primary">Rs. {(total * 1.1).toLocaleString()}</span>
                     </div>
 
                     <Button
@@ -351,26 +397,60 @@ export default function CartPage() {
                     </div>
                   </Card>
 
+                  <Card className="p-6 space-y-4">
+                    <h3 className="text-lg font-semibold">Payment Method</h3>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="card"
+                          checked={paymentMethod === "card"}
+                          onChange={(e) => setPaymentMethod(e.target.value as "card" | "cod")}
+                          className="w-4 h-4"
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">Credit/Debit Card</div>
+                          <div className="text-sm text-muted-foreground">Pay securely with Stripe</div>
+                        </div>
+                      </label>
+                      <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50">
+                        <input
+                          type="radio"
+                          name="paymentMethod"
+                          value="cod"
+                          checked={paymentMethod === "cod"}
+                          onChange={(e) => setPaymentMethod(e.target.value as "card" | "cod")}
+                          className="w-4 h-4"
+                        />
+                        <div className="flex-1">
+                          <div className="font-medium">Cash on Delivery</div>
+                          <div className="text-sm text-muted-foreground">Pay when you receive your order</div>
+                        </div>
+                      </label>
+                    </div>
+                  </Card>
+
                   <Card className="p-6">
                     <h3 className="text-lg font-semibold mb-2">Order Summary</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span>Subtotal</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>Rs. {total.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
                         <span>Tax (10%)</span>
-                        <span>${(total * 0.1).toFixed(2)}</span>
+                        <span>Rs. {(total * 0.1).toLocaleString()}</span>
                       </div>
                       <div className="border-t pt-2 flex justify-between font-bold text-lg">
                         <span>Total</span>
-                        <span>${(total * 1.1).toFixed(2)}</span>
+                        <span>Rs. {(total * 1.1).toLocaleString()}</span>
                       </div>
                     </div>
                   </Card>
 
-                  <Button onClick={handleProceedToPayment} className="w-full" size="lg">
-                    Proceed to Payment
+                  <Button onClick={handleProceedToPayment} className="w-full" size="lg" disabled={isCheckingOut}>
+                    {isCheckingOut ? "Processing..." : paymentMethod === "cod" ? "Place Order" : "Proceed to Payment"}
                   </Button>
                 </div>
               ) : (
